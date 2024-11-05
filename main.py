@@ -20,18 +20,20 @@ class AutoClickApp(App):
         # กำหนดเส้นทางของฟอนต์
         font_path = os.path.join(os.path.dirname(__file__), 'font', 'Kanit-SemiBold.ttf')
 
-        # สร้าง layout สำหรับจัดเรียงปุ่มและ label
-        layout = BoxLayout(orientation='vertical')
+        # สร้าง layout หลักสำหรับจัดเรียง row
+        main_layout = BoxLayout(orientation='vertical', spacing=10, padding=10)
         
-        # Scrollable area สำหรับแสดงพิกัดที่บันทึก
-        self.scroll_layout = GridLayout(cols=1, size_hint_y=None)
-        self.scroll_layout.bind(minimum_height=self.scroll_layout.setter('height'))
-        self.label = Label(text="กด 'เริ่มการบันทึกพิกัด' เพื่อเริ่มบันทึกพิกัดจากการคลิกซ้าย", font_size=18, font_name=font_path, size_hint_y=None, height=500, valign="top")
+        # Row แรก: Scrollable area สำหรับแสดงพิกัดที่บันทึก
+        self.label = Label(text="กด 'เริ่มการบันทึกพิกัด' เพื่อเริ่มบันทึกพิกัดจากการคลิกซ้าย", 
+                           font_size=18, font_name=font_path, size_hint_y=None, height=500, valign="top")
         self.label.bind(texture_size=self.label.setter('size'))
         
-        # ใส่ Label ลงใน ScrollView
-        scroll_view = ScrollView(size_hint=(1, 0.5))
+        scroll_view = ScrollView(size_hint=(1, 0.7))
         scroll_view.add_widget(self.label)
+        main_layout.add_widget(scroll_view)
+
+        # Row ที่สอง: ปุ่ม 4 ปุ่มในแนวนอน
+        button_layout = BoxLayout(orientation='horizontal', spacing=10, size_hint=(1, 0.3))
         
         # ปุ่มสำหรับเริ่มการบันทึกพิกัด
         self.start_record_button = Button(text="เริ่มการบันทึกพิกัด", font_size=18, font_name=font_path)
@@ -51,17 +53,19 @@ class AutoClickApp(App):
         self.start_button.bind(on_press=self.start_auto_click)
         self.start_button.disabled = True  # ปิดการใช้งานปุ่มในตอนแรก
 
-        # เพิ่ม widget ต่าง ๆ เข้า layout
-        layout.add_widget(scroll_view)
-        layout.add_widget(self.start_record_button)
-        layout.add_widget(self.stop_record_button)
-        layout.add_widget(self.reset_button)
-        layout.add_widget(self.start_button)
+        # เพิ่มปุ่มทั้งหมดลงใน button_layout
+        button_layout.add_widget(self.start_record_button)
+        button_layout.add_widget(self.stop_record_button)
+        button_layout.add_widget(self.reset_button)
+        button_layout.add_widget(self.start_button)
+        
+        # เพิ่มทั้งสอง row ลงใน main_layout
+        main_layout.add_widget(button_layout)
         
         # เริ่มการอัปเดตตำแหน่งเมาส์แบบเรียลไทม์
         Clock.schedule_interval(self.update_mouse_position, 0.1)
 
-        return layout
+        return main_layout
 
     def start_recording(self, instance):
         # เริ่มการฟังการคลิกซ้าย
